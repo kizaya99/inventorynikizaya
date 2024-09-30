@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, request, session, flash
+from flask import Flask, render_template, redirect, request, session, flash, url_for
 from flask_mysqldb import MySQL
 
 
@@ -172,6 +172,10 @@ class Inventory_Management:
                 cursor.execute("SELECT * FROM inv WHERE product_ID=%s", (productID,))
                 product_found = cursor.fetchone()
                 if product_found:
+                    
+                    insertHistory = "INSERT INTO history (activity, product_name,quantity) VALUES (%s, %s, %s)"
+                    cursor.execute(insertHistory,("Deleted Product", product_found[1], product_found[2]))
+                    
                     cursor.execute("DELETE FROM inv WHERE product_ID=%s", (productID,))
                     self.mysql.connection.commit()
                     flash("Product successfully deleted!")
@@ -196,6 +200,9 @@ class Inventory_Management:
                
                 cursor = self.mysql.connection.cursor()
                 cursor.execute("UPDATE inv set product_name=%s, Qty=%s, price=%s WHERE product_ID=%s", (new_product_name, new_productQuantity, new_product_price, productID))
+                
+                updateHistory = "INSERT INTO history (activity, product_name, quantity) VALUES (%s, %s, %s)"
+                cursor.execute(updateHistory, ("Updated Product", new_product_name, new_productQuantity))
                 self.mysql.connection.commit()
                 flash("Product successfully updated!")
                 return redirect("/inventory")
@@ -222,7 +229,17 @@ class Inventory_Management:
             
                 cursor = self.mysql.connection.cursor()
                 cursor.execute("INSERT INTO inventory_db.inv (product_name, Qty, price, category) VALUES (%s, %s, %s, %s)", (prd_name, prd_quantity, prd_price, prd_category))
+                
+                insertIntoHistory = "INSERT INTO history (activity, product_name, quantity) VALUES (%s, %s, %s)"
+                cursor.execute(insertIntoHistory, ("Add Product", prd_name, prd_quantity))
                 self.mysql.connection.commit()
+                
+                return """
+                        <script>
+                        window.alert("Product Added successfully");
+                        window.location.href = '{}'
+                        </script>
+                       """.format(url_for('addprd'))
                 
                 
                 
@@ -288,7 +305,14 @@ class Inventory_Management:
         @self.app.route('/transaction')
         def transaction():
             if "user" in session:
-                return render_template('trans.html')
+                
+                cur = self.mysql.connection.cursor()
+                getAllHistory = "SELECT * FROM history ORDER BY dateTime DESC"
+                cur.execute(getAllHistory)
+                allHistory = cur.fetchall()
+                
+                
+                return render_template('trans.html', allHistory = allHistory)
                 
             else:
                 return redirect("/")
