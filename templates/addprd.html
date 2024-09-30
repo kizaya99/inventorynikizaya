@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Product</title>
+    <link rel="stylesheet" href="static/addprd.css" >
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" />
+</body>
+<div class="hamburger-menu"> 
+  <i class="fas fa-bars"></i> 
+</div> 
+<div class="wrapper">
+    <div class="sidebar">
+      <h3>INVENTORY MANAGEMENT</h3>
+      <ul> 
+        <li><a href="{{url_for('dashboard')}}"> <i class="fa-solid fa-chart-pie"></i> DASHBOARD</a></li>
+        <li><a href="{{url_for('inventory')}}"> <i class="fa-solid fa-boxes-stacked"></i>  INVENTORY  </a></li> 
+        <li><a href="{{url_for('addprd')}}"> <i class="fa-solid fa-square-plus"></i> ADD PRODUCT</a></li>
+        <li><a href="{{url_for('transaction')}}"><i class="fa-solid fa-clipboard-list"></i>  TRANSACTIONS </a></li>
+        <li><a href="{{url_for('aboutus')}}"> <i class="fa-regular fa-address-card"></i> ABOUT US  </a></li> 
+        <li><a href="{{url_for('logout')}}"> <i class="fa-solid fa-right-from-bracket"></i> LOGOUT  </a></li> 
+      </ul> 
+
+
+
+    </div>
+
+    <div class="main_content">
+        <div class="header">ADD PRODUCT</div>
+
+      
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <ul>
+              {% for message in messages %}
+                <li>{{ message }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+       {% endwith %}
+
+
+
+
+
+
+
+        <div class="info">
+            <form action="/addprd" method="post">
+                <input type="text" placeholder="product name" name="productName">
+                <br>
+                <input type="text" placeholder="product quantity" name="productQuantity">
+                <br>
+                <input type="text" placeholder="product price" name="productPrice">
+                <br>
+                <select name="productCategory">
+                  <option value="Drinks">Drinks</option>
+                  <option value="Snacks">Snacks</option>
+                  <option value="Dairy Products">Dairy Products</option>
+                  <option value="Condiments and Sauces">Condiments and Sauces</option>
+                  <option value="Household Items">Household Items</option>
+                  <option value="Personal Care Products">Personal Care Products</option>
+                </select>
+                <br> 
+                
+                <button type="submit"> ADD PRODUCT</button>
+                </form>
+        </div>
+    </div>
+
+    
+    <script> 
+      document.querySelector('.hamburger-menu').addEventListener('click', function () { 
+        document.querySelector('.sidebar').classList.toggle('active'); 
+      }); 
+    </script> 
+
+
+
+
+
+
+</body>
+
+</html>
