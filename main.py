@@ -156,12 +156,6 @@ class Inventory_Management:
                 elif action == "deleter":
                     return render_template("delete.html", productID=productID)
 
-
-
-
-
-
-
         @self.app.route('/delete_product', methods=['POST'])
         def delete_product():
             productID = request.form["productID"]
