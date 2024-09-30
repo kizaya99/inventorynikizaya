@@ -1,0 +1,100 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    list-style: none;
+    text-decoration: none;
+}
+
+body{
+    background-color: #dfeae9;
+    
+}
+
+
+h2 {
+    font-family: "Cormorant Garamond", serif;
+    font-weight: 300;
+    font-style: normal;
+    text-align: center;
+    padding-bottom: 30px;
+    margin-top: 150px;
+
+}
+
+p {
+    font-family: "Kanit", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    text-align: center;
+    padding-top: 30px;
+
+}
+
+/* Flash Messages */
+
+ul {
+    display: flex;
+    justify-content: center;
+    padding-bottom: 30px;
+
+}
+
+li {
+    margin-right: 10px;
+    font-family: "Kanit", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+
+}
+
+li:last-child {
+    margin-right: 0;
+
+}
+
+/* Form Styles */
+
+form {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 30px;
+    max-width: 500px;
+    margin: 0 auto;
+
+}
+
+.button {
+    background-color: #765D67;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+
+}
+
+.button:hover {
+    background-color: #4B2138;
+
+}
+
+.button[type="submit"]:first-child {
+    margin-right: 10px;
+
+}
+
+
+button[type="submit"][value="no"] {
+    background-color: #ccc;
+    color: #333;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .button[type="submit"][value="no"]:hover {
+    background-color: #bbb;
+  }
