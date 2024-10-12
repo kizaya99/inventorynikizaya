@@ -13,6 +13,8 @@ class Inventory_Management:
         
         
         
+        
+        
         self.app.config['MYSQL_HOST'] = "localhost"
         self.app.config['MYSQL_USER'] = "root"
         self.app.config['MYSQL_PASSWORD'] = ""
@@ -23,8 +25,6 @@ class Inventory_Management:
         
         
         
-
-        
         
         #all def is method for handling webpages
     def setup_route(self):
@@ -32,6 +32,8 @@ class Inventory_Management:
         @self.app.route('/')
         def login():
             return render_template('login.html')
+        
+        
         
         
         
@@ -49,13 +51,18 @@ class Inventory_Management:
                 cursor.execute("SELECT * FROM accounts WHERE username=%s AND password=%s", (user_textbox, pass_textbox))
                 account_found = cursor.fetchone()
                 if account_found:
-                    session["user"] = account_found[3]
-                    return redirect("/inventory")
+                    session["user"] = account_found[1]
+                    return redirect("/dashboard")
                 
                 
                 else:
                     flash("username or password is incorrect. ")
                     return redirect("/")
+        
+        
+        
+        
+        
         
         
         
@@ -72,9 +79,29 @@ class Inventory_Management:
         
         
         
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         @self.app.route('/signup', methods=["GET"])
         def signup():
             return render_template('signup.html')
+
+
+
+
+
+
+
+
+
+
 
         @self.app.route('/signup_process', methods=["POST"])
         def signup_process():
@@ -103,6 +130,18 @@ class Inventory_Management:
         
         
         
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         @self.app.route('/search', methods=['POST'])
         def search():
             try:
@@ -116,6 +155,14 @@ class Inventory_Management:
                     return 'No search query provided', 400
             except Exception as e:
                     return 'An error occurred: {}'.format(e), 500
+        
+        
+        
+        
+        
+        
+        
+        
         
         
         
@@ -142,6 +189,12 @@ class Inventory_Management:
        
        
        
+       
+       
+       
+       
+       
+       
         @self.app.route('/update', methods=['GET', 'POST'])
         def update():
             if request.method == 'POST':
@@ -162,6 +215,10 @@ class Inventory_Management:
 
 
 
+
+
+
+
         @self.app.route('/delete_product', methods=['POST'])
         def delete_product():
             productID = request.form["productID"]
@@ -173,8 +230,8 @@ class Inventory_Management:
                 product_found = cursor.fetchone()
                 if product_found:
                     
-                    insertHistory = "INSERT INTO history (activity, product_name,quantity) VALUES (%s, %s, %s)"
-                    cursor.execute(insertHistory,("Deleted Product", product_found[1], product_found[2]))
+                    insertHistory = "INSERT INTO history (activity, product_name,quantity, user_name) VALUES (%s, %s, %s, %s)"
+                    cursor.execute(insertHistory,("Deleted Product", product_found[1], product_found[2], session["user"]))
                     
                     cursor.execute("DELETE FROM inv WHERE product_ID=%s", (productID,))
                     self.mysql.connection.commit()
@@ -185,6 +242,17 @@ class Inventory_Management:
                 flash("Deletion cancelled. Product not deleted.")
 
             return redirect("/inventory")
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
                
                
                
@@ -201,11 +269,18 @@ class Inventory_Management:
                 cursor = self.mysql.connection.cursor()
                 cursor.execute("UPDATE inv set product_name=%s, Qty=%s, price=%s WHERE product_ID=%s", (new_product_name, new_productQuantity, new_product_price, productID))
                 
-                updateHistory = "INSERT INTO history (activity, product_name, quantity) VALUES (%s, %s, %s)"
-                cursor.execute(updateHistory, ("Updated Product", new_product_name, new_productQuantity))
+                updateHistory = "INSERT INTO history (activity, product_name, quantity, user_name) VALUES (%s, %s, %s, %s)"
+                cursor.execute(updateHistory, ("Updated Product", new_product_name, new_productQuantity, session["user"]))
                 self.mysql.connection.commit()
                 flash("Product successfully updated!")
                 return redirect("/inventory")
+       
+       
+       
+       
+       
+       
+       
        
        
        
@@ -230,8 +305,8 @@ class Inventory_Management:
                 cursor = self.mysql.connection.cursor()
                 cursor.execute("INSERT INTO inventory_db.inv (product_name, Qty, price, category) VALUES (%s, %s, %s, %s)", (prd_name, prd_quantity, prd_price, prd_category))
                 
-                insertIntoHistory = "INSERT INTO history (activity, product_name, quantity) VALUES (%s, %s, %s)"
-                cursor.execute(insertIntoHistory, ("Add Product", prd_name, prd_quantity))
+                insertIntoHistory = "INSERT INTO history (activity, product_name, quantity, user_name) VALUES (%s, %s, %s, %s)"
+                cursor.execute(insertIntoHistory, ("Add Product", prd_name, prd_quantity, session["user"]))
                 self.mysql.connection.commit()
                 
                 return """
@@ -241,17 +316,20 @@ class Inventory_Management:
                         </script>
                        """.format(url_for('addprd'))
                 
-                
-                
                 cursor.close()
-
-                flash("YOU SUCCESFULLY ADDED AN NEW ITEM")
-            
-                return redirect("/addprd")
+                
+                
             else:
                 return render_template("addprd.html")
             
             
+        
+        
+        
+        
+        
+        
+        
         
         
         @self.app.route('/aboutus')
@@ -260,6 +338,16 @@ class Inventory_Management:
                 return render_template('aboutus.html')
             else:
                 return redirect("/")
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         
         
         
@@ -302,6 +390,16 @@ class Inventory_Management:
                 return redirect("/")
             
             
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
         @self.app.route('/transaction')
         def transaction():
             if "user" in session:
@@ -311,11 +409,18 @@ class Inventory_Management:
                 cur.execute(getAllHistory)
                 allHistory = cur.fetchall()
                 
+                username = {}
+                for history in allHistory:
+                    cur.execute("SELECT username FROM accounts WHERE id = %s", (history[4],))
+                    username = cur.fetchone()
+                    if username:
+                        username[history[0]] = username[0]
+                
                 
                 return render_template('trans.html', allHistory = allHistory)
                 
             else:
-                return redirect("/")
+                return redirect("trans.html", allHistory = [], usernames = {})
         
         
             
@@ -340,8 +445,13 @@ class Inventory_Management:
         
         
         
+        
+        
     def run(self):
         self.app.run(debug=True)
+        
+        
+        
         
         
         
